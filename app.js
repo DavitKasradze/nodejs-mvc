@@ -3,7 +3,7 @@ const path = require('path'); // ესეც დამავიწყდა
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const errorController = require(`./controllers/error`)
+const errorController = require('./controllers/error');
 
 const app = express();
 
