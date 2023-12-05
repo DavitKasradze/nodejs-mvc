@@ -28,7 +28,6 @@ module.exports = class Cart {
       }
       cart.totalPrice = cart.totalPrice + +(productPrice * existingProduct.qty);
       fs.writeFile(p, JSON.stringify(cart), (err) => {
-        console.log(err);
       });
     });
   };
