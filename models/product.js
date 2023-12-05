@@ -35,7 +35,7 @@ module.exports = class Product {
         const updatedProducts = [...products];
         updatedProducts[existingProductIndex] = this;
         fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-      });
+        });
       } else {
         this.id = Math.random().toString();
         products.push(this);
