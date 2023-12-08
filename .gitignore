@@ -42,3 +42,6 @@ charts
 
 /data/*
 !/data/.gitkeep
+
+/mysql-data/*
+!/mysql-data/.gitkeep
