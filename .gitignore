@@ -45,3 +45,6 @@ charts
 
 /mysql-data/*
 !/mysql-data/.gitkeep
+
+/mongo-data/*
+!/mongo-data/.gitkeep
