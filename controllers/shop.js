@@ -76,8 +76,8 @@ exports.postCart = (req, res, next) => {
   Product
     .findById(prodId)
     .then(product => {
+      console.log('===============================',req.user);
       return req.user.addToCart(product);
-
     })
     .then(result => {
       console.log(result);
