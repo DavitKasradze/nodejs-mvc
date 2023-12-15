@@ -54,7 +54,8 @@ class User {
       .then(products => {
         return products.map(p => {
           return {
-            ...p, quantity: this.cart.items.find(i => {
+            ...p,
+            quantity: this.cart.items.find(i => {
               return i.productId.toString() === p._id.toString();
             }).quantity
           };
@@ -76,6 +77,40 @@ class User {
         {_id: new ObjectId(this._id)},
         {$set: {cart: {items: updatedCartItems}}}
       );
+  }
+
+  addOrder() {
+    const db = getDb();
+    return this.getCart()
+      .then(products => {
+        const order = {
+          items: products,
+          user: {
+            _id: new ObjectId(this._id),
+            name: this.name,
+          }
+        };
+        return db
+          .collection('orders')
+          .insertOne(order);
+      })
+      .then(result => {
+        this.cart = {items: []};
+        return db
+          .collection('users')
+          .updateOne(
+            {_id: new ObjectId(this._id)},
+            {$set: {cart: {items: []}}}
+          );
+      });
+  }
+
+  getOrders() {
+    const db = getDb();
+    return db
+      .collection('orders')
+      .find({'user._id': new ObjectId(this._id)})
+      .toArray();
   }
 
   static findById(userId) {
