@@ -41,12 +41,12 @@ app.use((req, res, next) => {
     return next();
   }
   User.findById(req.session.user._id)
-      .then(user => {
-        req.user = user;
-        next();
-      })
-      .catch(err => console.log(err));
-})
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
