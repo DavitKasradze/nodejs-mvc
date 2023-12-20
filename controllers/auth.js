@@ -1,15 +1,18 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
-const sendgridTransport = require('nodemailer-sendgrid-transport');
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({username: 'api', key: process.env.MAILGUN_API_KEY || 'e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00'});
+
+// curl -s --user 'api:e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00' \
+// https://api.mailgun.net/v3/sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org/messages \
+// -F from='Excited User <mailgun@node-complete.com>' \
+// -F to=davit.kasradze23+01@gmail.com \
+// -F subject='Hello' \
+// -F text='Testing some Mailgun awesomeness!'
 
 const User = require('../models/user');
-
-const transporter = nodemailer.createTransport(sendgridTransport({
-  auth: {
-    api_key: ''
-  }
-}))
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -92,13 +95,15 @@ exports.postSignup = (req, res, next) => {
         })
         .then(result => {
           res.redirect('/login');
-          return transporter.sendMail({
-            to: email,
-            from: 'shop@node-complete.com',
-            subject: 'Sing-up Complete!',
-            html: '<h1>You successfully signed up!</h1>'
+          return mg.messages.create('sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org', {
+            from: "shop@node-complete.com",
+            to: [email],
+            subject: "Sing-up Complete!",
+            text: "You successfully signed up!",
+            html: "<h1>You successfully signed up!</h1>"
           })
-            .catch(err => console.log(err))
+            .then(msg => console.log(msg))
+            .catch(err => console.log(err));
         })
     })
     .catch(err => console.log(err));
@@ -133,7 +138,7 @@ exports.postReset = (req, res, next) => {
     }
     const token = buffer.toString('hex');
     User.findOne({
-      email: req.body.email
+      email: req.body.email})
         .then(user => {
           if (!user) {
             req.flash('error', 'No account with that email found');
@@ -145,27 +150,30 @@ exports.postReset = (req, res, next) => {
         })
         .then(result => {
             res.redirect('/');
-            return transporter.sendMail({
-              to: req.body.email,
-              from: 'shop@node-complete.com',
-              subject: 'Password Reset',
+            return mg.messages.create('sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org', {
+              from: "shop@node-complete.com",
+              to: [req.body.email],
+              subject: "Password Reset",
               html: `
                 <p>You requested a password reset</p>
                 <p>Click the <a href="http://localhost:3000/reset/${token}">link</a> to continue!</p>
                 `
             })
-              .catch(err => console.log(err))
+              .then(msg => console.log(msg))
+              .catch(err => console.log(err));
           }
         )
         .catch(err => console.log(err))
     })
-  })
 }
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
   User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}})
     .then(user => {
+      if (!user) {
+        return next();
+      }
       let message = req.flash('error');
       if (message.length > 0) {
         message = message[0];
@@ -188,7 +196,7 @@ exports.postNewPassword = (req, res, next) => {
   const passwordToken = req.body.passwordToken;
   let resetUser;
 
-  User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}, _id: userId})
+  User.findOne({resetToken: passwordToken, resetTokenExpiration: {$gt: Date.now()}, _id: userId})
     .then(user => {
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
