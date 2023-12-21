@@ -74,7 +74,7 @@ exports.postLogin = (req, res, next) => {
       validationErrors: errors.array()
     });
   }
-  User.findOne({email: email})
+  User.findOne({ email: email })
     .then(user => {
       if (!user) {
         return res.status(422).render('auth/login', {
@@ -113,7 +113,7 @@ exports.postLogin = (req, res, next) => {
         .catch(err => {
           console.log(err);
           res.redirect('/login');
-        })
+        });
 
     })
     .catch(err => console.log(err));
@@ -122,6 +122,7 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render('auth/signup', {
@@ -176,9 +177,9 @@ exports.getReset = (req, res, next) => {
   res.render('auth/reset', {
     path: '/reset',
     pageTitle: 'Password Reset',
-    errorMessage: message
+    errorMessage: message,
   });
-}
+};
 
 exports.postReset = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
@@ -188,7 +189,7 @@ exports.postReset = (req, res, next) => {
     }
     const token = buffer.toString('hex');
     User.findOne({
-      email: req.body.email
+      email: req.body.email,
     })
       .then(user => {
         if (!user) {
@@ -202,25 +203,25 @@ exports.postReset = (req, res, next) => {
       .then(result => {
           res.redirect('/');
           return mg.messages.create('sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org', {
-            from: "shop@node-complete.com",
+            from: 'shop@node-complete.com',
             to: [req.body.email],
-            subject: "Password Reset",
+            subject: 'Password Reset',
             html: `
                 <p>You requested a password reset</p>
                 <p>Click the <a href="http://localhost:3000/reset/${token}">link</a> to continue!</p>
-                `
+                `,
           })
             .then(msg => console.log(msg))
             .catch(err => console.log(err));
-        }
+        },
       )
-      .catch(err => console.log(err))
-  })
-}
+      .catch(err => console.log(err));
+  });
+};
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
-  User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}})
+  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
     .then(user => {
       if (!user) {
         return next();
@@ -236,10 +237,10 @@ exports.getNewPassword = (req, res, next) => {
         pageTitle: 'New Password',
         errorMessage: message,
         userId: user._id.toString(),
-        passwordToken: token
-      })
-    })
-}
+        passwordToken: token,
+      });
+    });
+};
 
 exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
@@ -247,7 +248,7 @@ exports.postNewPassword = (req, res, next) => {
   const passwordToken = req.body.passwordToken;
   let resetUser;
 
-  User.findOne({resetToken: passwordToken, resetTokenExpiration: {$gt: Date.now()}, _id: userId})
+  User.findOne({ resetToken: passwordToken, resetTokenExpiration: { $gt: Date.now() }, _id: userId })
     .then(user => {
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
@@ -261,5 +262,5 @@ exports.postNewPassword = (req, res, next) => {
     .then(result => {
       res.redirect('/login');
     })
-    .catch(err => console.log(err))
-}
+    .catch(err => console.log(err));
+};
