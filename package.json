@@ -23,6 +23,7 @@
     "express": "^4.16.3",
     "express-handlebars": "^7.1.2",
     "express-session": "^1.15.6",
+    "express-validator": "^7.0.1",
     "form-data": "^4.0.0",
     "mailgun.js": "^9.4.0",
     "mongodb": "^3.1.6",
