@@ -1,5 +1,5 @@
 const express = require('express');
-const {check, body} = require('express-validator');
+const { body } = require('express-validator');
 
 const authController = require('../controllers/auth');
 const User = require('../models/user');
@@ -12,32 +12,24 @@ router.get('/signup', authController.getSignup);
 
 router.post('/login',
   [
-    check('email')
+    body('email')
       .isEmail()
       .withMessage('Invalid Email!')
-      .custom((value, {req}) => {
-        return User.findOne({email: value})
-          .then(userDoc => {
-            if (userDoc) {
-              return Promise.reject(
-                'User is already registered with that email address!'
-              );
-            }
-          });
-      }),
+      .normalizeEmail(),
     body(
       'password',
       'Please enter a correct password!'
     )
       .isLength({min: 5})
       .isAlphanumeric()
+      .trim()
   ],
   authController.postLogin);
 
 router.post(
   '/signup',
   [
-    check('email')
+    body('email')
       .isEmail()
       .withMessage('Invalid Email!')
       .custom((value, {req}) => {
@@ -54,14 +46,17 @@ router.post(
               );
             }
           });
-      }),
+      })
+      .normalizeEmail(),
     body(
       'password',
       'Please enter a password with more than 5 characters and only numbers!'
     )
       .isLength({min: 5})
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
     body('confirmPassword')
+      .trim()
       .custom((value, {req}) => {
         if (value !== req.body.password) {
           throw new Error('Passwords do not match!')

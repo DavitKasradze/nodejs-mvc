@@ -7,7 +7,7 @@ const mg = mailgun.client({
   username: 'api',
   key: process.env.MAILGUN_API_KEY || 'e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00'
 });
-const {validationResult} = require('express-validator')
+const {validationResult} = require('express-validator');
 
 // curl -s --user 'api:e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00' \
 // https://api.mailgun.net/v3/sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org/messages \
