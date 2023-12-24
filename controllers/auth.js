@@ -74,7 +74,7 @@ exports.postLogin = (req, res, next) => {
       validationErrors: errors.array()
     });
   }
-  User.findOne({ email: email })
+  User.findOne({email: email})
     .then(user => {
       if (!user) {
         return res.status(422).render('auth/login', {
@@ -116,7 +116,11 @@ exports.postLogin = (req, res, next) => {
         });
 
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postSignup = (req, res, next) => {
@@ -156,7 +160,11 @@ exports.postSignup = (req, res, next) => {
         text: "You successfully signed up!",
         html: "<h1>You successfully signed up!</h1>"
       })
-        .catch(err => console.log(err));
+        .catch(err => {
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          return next(error);
+        });
     });
 };
 
@@ -212,16 +220,24 @@ exports.postReset = (req, res, next) => {
                 `,
           })
             .then(msg => console.log(msg))
-            .catch(err => console.log(err));
+            .catch(err => {
+              const error = new Error(err);
+              error.httpStatusCode = 500;
+              return next(error);
+            });
         },
       )
-      .catch(err => console.log(err));
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
 };
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
-  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
+  User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}})
     .then(user => {
       if (!user) {
         return next();
@@ -248,7 +264,7 @@ exports.postNewPassword = (req, res, next) => {
   const passwordToken = req.body.passwordToken;
   let resetUser;
 
-  User.findOne({ resetToken: passwordToken, resetTokenExpiration: { $gt: Date.now() }, _id: userId })
+  User.findOne({resetToken: passwordToken, resetTokenExpiration: {$gt: Date.now()}, _id: userId})
     .then(user => {
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
@@ -262,5 +278,9 @@ exports.postNewPassword = (req, res, next) => {
     .then(result => {
       res.redirect('/login');
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
