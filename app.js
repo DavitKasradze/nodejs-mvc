@@ -7,7 +7,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
-const multer = require('multer')
+const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -28,9 +28,9 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname)
-  }
-}) //ეს ვერ გავიგე კარგად
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  },
+}); //ეს ვერ გავიგე კარგად
 
 const fileFilter = (req, file, cb) => {
   if (
@@ -51,8 +51,8 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
@@ -84,7 +84,7 @@ app.use((req, res, next) => {
       next();
     })
     .catch(err => {
-      next(new Error(err))
+      next(new Error(err));
     });
 });
 
@@ -93,18 +93,17 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.use('/500', errorController.get500)
+app.use('/500', errorController.get500);
 
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-  res.status(500).render('500',
-    {
+  res.status(500).render('500', {
     pageTitle: 'Error',
     path: '/500',
-    isAuthenticated: req.session.isLoggedIn
-  })
-})
+    isAuthenticated: req.session.isLoggedIn,
+  });
+});
 
 mongoose
   .connect(
