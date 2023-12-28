@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 const fileHelper = require('../util/file');
 
-const { validationResult } = require('express-validator');
+const {validationResult} = require('express-validator');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -20,7 +20,7 @@ exports.postAddProduct = (req, res, next) => {
   const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
-  if  (!image) {
+  if (!image) {
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/edit-product',
@@ -175,7 +175,7 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find({ userId: req.user._id })
+  Product.find({userId: req.user._id})
     // .select('title price -_id')
     // .populate('userId', 'name')
     .then(products => {
@@ -200,7 +200,7 @@ exports.deleteProduct = (req, res, next) => {
         return next(new Error('Product not found!'))
       }
       fileHelper.deleteFile(product.imageUrl);
-      return Product.deleteOne({ _id: prodId, userId: req.user._id })
+      return Product.deleteOne({_id: prodId, userId: req.user._id})
     })
     .then(() => {
       console.log('DESTROYED PRODUCT');
@@ -209,7 +209,6 @@ exports.deleteProduct = (req, res, next) => {
     .catch(err => {
       res.status(500).json({message: 'Deleting The Product Failed!'});
     });
-
 
 
 };

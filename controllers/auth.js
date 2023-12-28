@@ -7,7 +7,7 @@ const mg = mailgun.client({
   username: 'api',
   key: process.env.MAILGUN_API_KEY || 'e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00',
 });
-const { validationResult } = require('express-validator');
+const {validationResult} = require('express-validator');
 
 // curl -s --user 'api:e2cf9bd8cadecbd6c1548d253c8d9de8-5e3f36f5-ce89fd00' \
 // https://api.mailgun.net/v3/sandbox342d18aa82ec4c15a171d481da1a7277.mailgun.org/messages \
@@ -74,7 +74,7 @@ exports.postLogin = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
-  User.findOne({ email: email })
+  User.findOne({email: email})
     .then(user => {
       if (!user) {
         return res.status(422).render('auth/login', {
@@ -85,7 +85,7 @@ exports.postLogin = (req, res, next) => {
             email: email,
             password: password,
           },
-          validationErrors: [{ param: 'email' }],
+          validationErrors: [{param: 'email'}],
         });
       }
       bcrypt
@@ -107,7 +107,7 @@ exports.postLogin = (req, res, next) => {
               email: email,
               password: password,
             },
-            validationErrors: [{ param: 'password' }],
+            validationErrors: [{param: 'password'}],
           });
         })
         .catch(err => {
@@ -147,7 +147,7 @@ exports.postSignup = (req, res, next) => {
       const user = new User({
         email: email,
         password: hashedPassword,
-        cart: { items: [] },
+        cart: {items: []},
       });
       return user.save();
     })
@@ -237,7 +237,7 @@ exports.postReset = (req, res, next) => {
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
-  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
+  User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}})
     .then(user => {
       if (!user) {
         return next();
@@ -264,7 +264,7 @@ exports.postNewPassword = (req, res, next) => {
   const passwordToken = req.body.passwordToken;
   let resetUser;
 
-  User.findOne({ resetToken: passwordToken, resetTokenExpiration: { $gt: Date.now() }, _id: userId })
+  User.findOne({resetToken: passwordToken, resetTokenExpiration: {$gt: Date.now()}, _id: userId})
     .then(user => {
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
