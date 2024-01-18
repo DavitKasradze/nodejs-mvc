@@ -13,7 +13,7 @@ const errorController = require('./controllers/error');
 const User = require('./models/user');
 
 const MONGODB_URI =
-  'mongodb://root:Password123@127.0.0.1:27017/shop?authSource=admin';
+  `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@127.0.0.1:27017/${process.env.MONGO_DEFAULT_DATABASE}?authSource=admin`;
 
 const app = express();
 const store = new MongoDBStore({
@@ -115,7 +115,7 @@ mongoose
       useUnifiedTopology: true,
     })
   .then(result => {
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
   })
   .catch(err => {
     console.log(err);
