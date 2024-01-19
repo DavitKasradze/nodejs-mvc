@@ -17,9 +17,9 @@ const morgan = require('morgan');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
-const MONGODB_URI =
-  // `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@127.0.0.1:27017/${process.env.MONGO_DEFAULT_DATABASE}?authSource=admin`;
-  `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gmcrstj.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`
+const MONGODB_URI = (process.env.MONGO_USER && process.env.MONGO_PASSWORD && process.env.MONGO_DEFAULT_DATABASE)
+  ? `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.gmcrstj.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`
+  : `mongodb://root:Password123@127.0.0.1:27017/shop?authSource=admin`;
 
 const app = express();
 const store = new MongoDBStore({
