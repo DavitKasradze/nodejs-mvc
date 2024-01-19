@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+server.cert
+server.key
+
 # Logs
 logs
 *.log
